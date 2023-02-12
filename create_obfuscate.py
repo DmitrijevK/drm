@@ -31,44 +31,56 @@ def generate_deobfuscation_key():
     # Generate a random deobfuscation key
     return str(random.getrandbits(256))
 
+def add_hash_key_check(file_path, hash_key):
+    # Add a function that checks for the hash key to the end of the file
+    with open(file_path, "a") as file:
+        file.write(f"\ndo\n"
+                   f"    local key = '{hash_key}'\n"
+                   f"    if key ~= '{hash_key}' then\n"
+                   f"        error('Invalid Hash Key')\n"
+                   f"    end\n"
+                   f"end")
+
 def main():
     file_path = input("Enter the path of the Lua file: ")
     file_name = os.path.basename(file_path)
     file_content = read_file(file_path)
 
     if file_content is not None:
-        # Obfuscate the Lua file
+    # Obfuscate the Lua file
         obfuscated_file_content = obfuscate_lua(file_content)
         obfuscated_file_path = os.path.join(os.path.dirname(file_path), "obfuscated_" + file_name)
         write_file(obfuscated_file_path, obfuscated_file_content)
 
-        # Generate the hash key and deobfuscation key
+    # Generate the hash key and deobfuscation key
         hash_key = generate_hash_key()
         deobfuscation_key = generate_deobfuscation_key()
 
-        # Write the hash key and deobfuscation key to a text file
+    # Write the hash key and deobfuscation key to a text file
         key_file_path = os.path.join(os.path.dirname(file_path), "key.txt")
         write_file(key_file_path, "Hash Key: " + hash_key + "\nDeobfuscation Key: " + deobfuscation_key)
 
-        # Connect to the database
-        mydb = pymysql.connect(
-            host="localhost",
-            user="root",
-            password="",
-            database="gmlua"
-        )
-        try:
-            with mydb.cursor() as cursor:
-                # Check if the hash key already exists in the database
-                sql = "SELECT * FROM glua WHERE `hash_key` = %s"
-                cursor.execute(sql, (hash_key,))
-                result = cursor.fetchone()
-            while result is not None:
-                hash_key = generate_hash_key()
-                sql = "SELECT * FROM glua WHERE `hash_key` = %s"
-                cursor.execute(sql, (hash_key,))
-                result = cursor.fetchone()
-                sql = "INSERT INTO glua (license_key, hash_key, ip, status) VALUES (%s,%s,%s,%s,)"
-                cursor.execute(sql, (deobfuscation_key, hash_key, "", 0))
-        mydb.commit()
-        mydb.close()
+    # Connect to the database
+    mydb = pymysql.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="gmlua"
+    )
+    try:
+        with mydb.cursor() as cursor:
+            # Check if the hash key already exists in the database
+            sql = "SELECT * FROM glua WHERE `hash_key` = %s"
+            cursor.execute(sql, (hash_key,))
+            result = cursor.fetchone()
+        while result is not None:
+            hash_key = generate_hash_key()
+            sql = "SELECT * FROM glua WHERE `hash_key` = %s"
+            cursor.execute(sql, (hash_key,))
+            result = cursor.fetchone()
+            sql = "INSERT INTO glua (license_key, hash_key, ip, status) VALUES (%s,%s,%s,%s,)"
+            cursor.execute(sql, (deobfuscation_key, hash_key, "", 0))
+    except:
+        print("An exception occurred") 
+    mydb.commit()
+    mydb.close()
