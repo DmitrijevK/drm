@@ -4,9 +4,6 @@ import random
 import pymysql.cursors
 import lupa
 
-DB_HOST = "localhost"
-DB_USER = "root"
-
 def read_file(file_path):
     try:
         with open(file_path, "r") as file:
