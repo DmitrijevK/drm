@@ -2,7 +2,7 @@ import os
 import hashlib
 import random
 import pymysql.cursors
-
+import lupa
 def read_file(file_path):
     try:
         with open(file_path, "r") as file:
@@ -19,9 +19,14 @@ def write_file(file_path, content):
         print(f"An error occurred while writing the file: {e}")
 
 def obfuscate_lua(file_content):
-    # Obfuscate the Lua file content
-    # Add your own implementation here
-    return file_content
+    lua = lupa.LuaRuntime(unpack_returned_tuples=True)
+    obfuscated_code = lua.execute(f"return require('obfuscate')({file_content})")
+    return obfuscated_code
+    try:
+        with open(file_content, "w") as file:
+            file.write(obfuscated_code)
+    except Exception as e:
+        print(f"An error occurred while writing the file: {e}")
 
 def generate_hash_key():
     # Generate a random hash key
@@ -53,7 +58,7 @@ def main():
         write_file(obfuscated_file_path, obfuscated_file_content)
 
     # Generate the hash key and deobfuscation key
-        hash_key = generate_hash_key()
+        hash_key = generate_hash_key()ф
         deobfuscation_key = generate_deobfuscation_key()
 
     # Write the hash key and deobfuscation key to a text file
