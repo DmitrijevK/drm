@@ -14,4 +14,4 @@ I decided to try myself not only in attack, but also in defense, if you can call
 4. Run `Server.py` and `create_obfuscate.py`
 5. Set a path to file and rejoice
 
-## the script needs to be improved, namely to add an obfuscation system if I'm not too lazy to add, and so whoever wants can use and rewrite:)
+## the script needs to be improved
